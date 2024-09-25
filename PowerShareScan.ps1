@@ -18,7 +18,7 @@ $GetChildParam = @{
 	Directory = $true
 	Recurse = $true
 }
-
+$TranscribeActive = 'no'
 
 
 ### BANNER ###
@@ -95,6 +95,17 @@ Write-Host "`n--- Want to suppress errors? ---`n" -ForegroundColor green
 $SuppressErrorChoise = Read-Host -Prompt "yes / no"
 If ($SuppressErrorChoise -eq 'yes') {
 	$ErrorActionPreference = 'silentlycontinue'
+}
+
+# Start Logging Function
+Write-Host "`n--- Output Logging ---`n" -ForegroundColor green
+Write-Host "Leave blank to not produce logs" -ForegroundColor yellow
+Write-Host "If you want to log output into a file specify a file name" -ForegroundColor yellow
+Write-Host "e.g logfile.txt`n" -ForegroundColor red
+$loggingOutputChoise = Read-Host
+if ($loggingOutputChoise -ne '') {
+	Start-Transcript -Path $loggingOutputChoise -Append
+	$TranscribeActive = 'yes'
 }
 
 # Function to choise depth
@@ -416,6 +427,15 @@ If ($choise -eq '10') {
 	Write-Host "---------------------" -ForegroundColor green
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
+}
+
+
+
+### Close task if opened ###
+# Stop Logging Function 
+if ($TranscribeActive -eq 'yes') {
+	Stop-Transcript | Out-Null
+	Write-Host "--- Logging Stopped ---`n" -ForegroundColor green
 }
 
 ### END ###
