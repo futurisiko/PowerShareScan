@@ -57,14 +57,23 @@ Specify function number:
 ```
 
 Possible options do exaclty what they say.
-After you choise the scan type some additional info will be required.
+After you choise the scan type some additional info will be required. <br>
 
 ```
 --- Want to suppress errors? ---
 
 yes / no:
 ```
-Specify ```yes``` if you want to suppress annoying errors in the terminal
+Specify ```yes``` if you want to suppress annoying errors in the terminal <br>
+
+```
+--- Output Logging ---
+
+Leave blank to not produce logs
+If you want to log output into a file specify a file name
+e.g logfile.txt
+```
+Specify a filename if you want to save/log all scan's output into a file <br>
 
 ```
 --- SHARES on \\TARGETFILESERVER\ ---
@@ -74,7 +83,7 @@ Share2
 
 --- Which share do you want to scan ? ---
 ```
-If you choose a scan that target a specific share you will have to specify it.
+If you choose a scan that target a specific share you will have to specify it. <br>
 
 ```
 --- Scan Depth ---
