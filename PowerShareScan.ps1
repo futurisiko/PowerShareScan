@@ -18,7 +18,12 @@ $GetChildParam = @{
 	Directory = $true
 	Recurse = $true
 }
+$GetChildParamFiles = @{
+	File = $true
+	Recurse = $true
+}
 $TranscribeActive = 'no'
+
 
 
 ### BANNER ###
@@ -85,6 +90,8 @@ Write-Host "7 - Dump ALL PERMISSIONS assigned in ALL SHARES"
 Write-Host "8 - Dump ALL PERMISSIONS assigned in a TARGET SHARE"
 Write-Host "9 - Search TARGET USER Permissions in ALL SHARES"
 Write-Host "10 - Search TARGET USER Permissions in a TARGET SHARE"
+Write-Host "11 - Dump LastModifiedDate and Size of FILES from ALL SHARES into a CSV"
+Write-Host "12 - Dump LastModifiedDate and Size of FILES from a TARGET SHARE into a CSV"
 $choise = Read-Host -Prompt "`nSpecify function number"
 
 
@@ -101,10 +108,10 @@ If ($SuppressErrorChoise -eq 'yes') {
 Write-Host "`n--- Output Logging ---`n" -ForegroundColor green
 Write-Host "Leave blank to not produce logs" -ForegroundColor yellow
 Write-Host "If you want to log output into a file specify a file name" -ForegroundColor yellow
-Write-Host "e.g logfile.txt`n" -ForegroundColor red
+Write-Host "e.g. logfile.txt`n" -ForegroundColor red
 $loggingOutputChoise = Read-Host
 if ($loggingOutputChoise -ne '') {
-	Start-Transcript -Path $loggingOutputChoise -Append
+	Start-Transcript -Path "$loggingOutputChoise" -Append
 	$TranscribeActive = 'yes'
 }
 
@@ -427,6 +434,87 @@ If ($choise -eq '10') {
 	Write-Host "---------------------" -ForegroundColor green
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
+}
+
+# 11 - Dump FILES LastModifiedDate and Size from ALL SHARES
+If ($choise -eq '11') {
+	$fileInfoArray = @() # Array to store files info
+	$CSVFileName = ""
+	$DepthParam = SetDepth
+	Write-Host "`n--- CSV Filename ---`n" -ForegroundColor green
+	Write-Host "Specify the CSV Filename to use to save the dump" -ForegroundColor yellow
+	Write-Host "e.g. filesInfo.csv`n" -ForegroundColor red
+	while ($CSVFileName -eq "") {
+		$CSVFileName = Read-Host  
+		if ($CSVFileName -eq "") {
+			Write-Host "Filename cannot be empty. Please try again`n" -ForegroundColor yellow
+		}
+	}
+	Write-Host "`n---------------" -ForegroundColor green
+	Write-Host "--- Started ---" -ForegroundColor green
+	Write-Host "---------------`n`n" -ForegroundColor green
+	$shares | 
+	ForEach-Object { $fullPath = $rootPath + $_ ; Get-ChildItem "$fullPath" @GetChildParamFiles @DepthParam | 
+		ForEach-Object { $file = $_ ;
+			$file.Fullname ; #Print status
+			$fileInfo = New-Object PSObject ; 	# Create a new object with the file path and last modified date
+			$fileInfo | Add-Member -MemberType NoteProperty -Name "FilePath" -Value $file.FullName ;
+			$fileInfo | Add-Member -MemberType NoteProperty -Name "LastModifiedDate" -Value $file.LastWriteTime ;
+			$fileInfo | Add-Member -MemberType NoteProperty -Name "Size in bytes" -Value $file.Length ;
+			$fileInfoArray += $fileInfo ; # Add the new object to the array
+		} ; 
+		$fileInfoArray = $fileInfoArray | Sort-Object LastModifiedDate # Sort the array by last modified date (from older to newer)
+		$fileInfoArray | Export-Csv -Path "$CSVFileName" -NoTypeInformation # Export the array to a CSV file
+		Write-Host "`n--- Dump saved on " -NoNewline -ForegroundColor green
+		Write-Host "$CSVFileName" -NoNewLine -ForegroundColor yellow
+		Write-Host " ---`n" -ForegroundColor green
+	} ;
+	Write-Host "---------------------" -ForegroundColor green
+	Write-Host "--- Completed \m/ ---" -ForegroundColor green
+	Write-Host "---------------------`n" -ForegroundColor green	
+}
+
+# 12 - Dump FILES LastModifiedDate and Size from a TARGET SHARE
+If ($choise -eq '12') {
+	$fileInfoArray = @() # Array to store files info
+	$CSVFileName = ""
+	Write-Host "`n--- SHARES on " -NoNewline -ForegroundColor green
+	Write-Host "$rootPath" -NoNewLine -ForegroundColor yellow
+	Write-Host " --- `n" -ForegroundColor green
+	$shares
+	Write-Host "`n--- Which share do you want to scan ? ---`n" -ForegroundColor green # Prompt for attribute to look for
+	$targetShare = Read-Host
+	$DepthParam = SetDepth
+	Write-Host "`n--- CSV Filename ---`n" -ForegroundColor green
+	Write-Host "Specify the CSV Filename to use to save the dump" -ForegroundColor yellow
+	Write-Host "e.g. filesInfo.csv`n" -ForegroundColor red
+	while ($CSVFileName -eq "") {
+		$CSVFileName = Read-Host  
+		if ($CSVFileName -eq "") {
+			Write-Host "Filename cannot be empty. Please try again`n" -ForegroundColor yellow
+		}
+	}
+	Write-Host "`n---------------" -ForegroundColor green
+	Write-Host "--- Started ---" -ForegroundColor green
+	Write-Host "---------------`n`n" -ForegroundColor green
+	$fullPath = $rootPath + $targetShare ; 
+	Get-ChildItem "$fullPath" @GetChildParamFiles @DepthParam | 
+		ForEach-Object { $file = $_ ;
+			$file.Fullname ; #Print status
+			$fileInfo = New-Object PSObject ; 	# Create a new object with the file path and last modified date
+			$fileInfo | Add-Member -MemberType NoteProperty -Name "FilePath" -Value $file.FullName ;
+			$fileInfo | Add-Member -MemberType NoteProperty -Name "LastModifiedDate" -Value $file.LastWriteTime ;
+			$fileInfo | Add-Member -MemberType NoteProperty -Name "Size in bytes" -Value $file.Length ;
+			$fileInfoArray += $fileInfo ; # Add the new object to the array
+		} ; 
+		$fileInfoArray = $fileInfoArray | Sort-Object LastModifiedDate # Sort the array by last modified date (from older to newer)
+		$fileInfoArray | Export-Csv -Path "$CSVFileName" -NoTypeInformation # Export the array to a CSV file
+		Write-Host "`n--- Dump saved on " -NoNewline -ForegroundColor green
+		Write-Host "$CSVFileName" -NoNewLine -ForegroundColor yellow
+		Write-Host " ---`n" -ForegroundColor green	
+	Write-Host "---------------------" -ForegroundColor green
+	Write-Host "--- Completed \m/ ---" -ForegroundColor green
+	Write-Host "---------------------`n" -ForegroundColor green	
 }
 
 
