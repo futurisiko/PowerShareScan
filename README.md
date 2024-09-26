@@ -92,5 +92,14 @@ Leave blank to scan recursevely all folders
 Or specify the depth of the scan numerically
 e.g. 1, 2, 3
 ```
-Specify the depth level of the scan. 1 will check just root folders present in the share. Leave it blank to recursevely check everything.
+Specify the depth level of the scan. 1 will check just root folders present in the share. Leave it blank to recursevely check everything. <br>
+
+```
+--- CSV Filename ---
+
+Specify the CSV Filename to use to save the dump
+e.g. filesInfo.csv
+```
+If the function dump output to a csv file it asks to specify csv filename too use.
+
 
