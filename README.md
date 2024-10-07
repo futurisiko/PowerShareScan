@@ -48,14 +48,14 @@ Specify function number:
 ```
 
 Options do exaclty what they say.
-After you choise the scan type some additional info can be be required depending of the fucntion chosen. <br>
+After you choise the scan type some additional info can be be required depending of the fucntion chosen. <br><br>
 
 ```
 --- Want to suppress errors? ---
 
 yes / no:
 ```
-Specify ```yes``` if you want to suppress annoying errors in the terminal <br>
+Specify ```yes``` if you want to suppress annoying errors in the terminal <br><br>
 ```
 --- Output Logging ---
 
@@ -63,14 +63,14 @@ Leave blank to not produce logs
 If you want to log output into a file specify a file name
 e.g logfile.txt
 ```
-Specify a filename if you want to save/log all scan's output into a file <br>
+Specify a filename if you want to save/log all scan's output into a file <br><br>
 ```
 --- Specify target SVM/SERVER ---
 
 Pay attention to sintax
 e.g. \\SVM\
 ```
-Specify the target FileServer or SVM. <br>
+Specify the target FileServer or SVM. <br><br>
 ```
 --- SHARES on \\TARGETFILESERVER\ ---
 
@@ -79,7 +79,7 @@ Share2
 
 --- Which share do you want to scan ? ---
 ```
-If you choose a scan that target a specific share you will have to specify it. <br>
+If you choose a scan that target a specific share you will have to specify it. <br><br>
 
 ```
 --- Scan Depth ---
@@ -88,7 +88,7 @@ Leave blank to scan recursevely all folders
 Or specify the depth of the scan numerically
 e.g. 1, 2, 3
 ```
-Specify the depth level of the scan. 1 will check just root folders present in the share. Leave it blank to recursevely check everything. <br>
+Specify the depth level of the scan. 1 will check just root folders present in the share. Leave it blank to recursevely check everything. <br><br>
 
 ```
 --- CSV Filename ---
@@ -96,12 +96,12 @@ Specify the depth level of the scan. 1 will check just root folders present in t
 Specify the CSV Filename to use to save the dump
 e.g. filesInfo.csv
 ```
-If the function dump output to a csv file it asks to specify csv filename too use.<br>
+If the function dump output to a csv file it asks to specify csv filename too use.<br><br>
 ```
 --- CSV in input with files list ---
 The CSV file need to contain a column named 'FullPath' which contains target files fullpath
 ```
-The copy function will require a csv file as input.
+The copy function will require a csv file as input.<br><br>
 ```
 --- Destionation root path ---
 e.g. Z:\
