@@ -1,8 +1,8 @@
 # PowerShareScan
 
 Powershell Script/Tool to perform various scans to dump Security permission of FileServer and/or SVM.<br>
-***ATTENTION > Keep in mind that it will consider just folders, not files.*** <br>
-For the tool purpose it's inhalf to check folders and also make the job of iterating easier. <br>
+***ATTENTION > Keep in mind that most of the permission analysis will consider just folders, not files.*** <br>
+<br>
 
 ```
 PS C:\Temp> .\PowerShareScan.ps1
@@ -27,19 +27,6 @@ dP .dMP dMP.aMP dMP dMP dMP dMP
 VMMMP   VMMMP  dMP dMP dMP dMP  By Futurisiko
 
 
---- Specify target SVM/SERVER ---
-
-Pay attention to sintax.
-e.g. \\SVM\
-
-\\TARGETFILESERVER\
-
---- SHARES on \\TARGETFILESERVER\ ---
-
-Share1
-Share2
-Share3
-
 --- MENU ---
 
 1 - Find permissions given to EVERYONE in ALL SHARES
@@ -52,12 +39,16 @@ Share3
 8 - Dump ALL PERMISSIONS assigned in a TARGET SHARE
 9 - Search TARGET USER Permissions in ALL SHARES
 10 - Search TARGET USER Permissions in a TARGET SHARE
+11 - Dump LastModifiedDate and Size of FILES from ALL SHARES into a CSV
+12 - Dump LastModifiedDate and Size of FILES from a TARGET SHARE into a CSV
+13 - Check where INHERITANCE is DISABLED in a TARGET share
+14 - Copy Targeted File List to the a new Location
 
 Specify function number:
 ```
 
-Possible options do exaclty what they say.
-After you choise the scan type some additional info will be required. <br>
+Options do exaclty what they say.
+After you choise the scan type some additional info can be be required depending of the fucntion chosen. <br>
 
 ```
 --- Want to suppress errors? ---
@@ -65,7 +56,6 @@ After you choise the scan type some additional info will be required. <br>
 yes / no:
 ```
 Specify ```yes``` if you want to suppress annoying errors in the terminal <br>
-
 ```
 --- Output Logging ---
 
@@ -74,7 +64,13 @@ If you want to log output into a file specify a file name
 e.g logfile.txt
 ```
 Specify a filename if you want to save/log all scan's output into a file <br>
+```
+--- Specify target SVM/SERVER ---
 
+Pay attention to sintax
+e.g. \\SVM\
+```
+Specify the target FileServer or SVM. <br>
 ```
 --- SHARES on \\TARGETFILESERVER\ ---
 
@@ -100,6 +96,15 @@ Specify the depth level of the scan. 1 will check just root folders present in t
 Specify the CSV Filename to use to save the dump
 e.g. filesInfo.csv
 ```
-If the function dump output to a csv file it asks to specify csv filename too use.
-
+If the function dump output to a csv file it asks to specify csv filename too use.<br>
+```
+--- CSV in input with files list ---
+The CSV file need to contain a column named 'FullPath' which contains target files fullpath
+```
+The copy function will require a csv file as input.
+```
+--- Destionation root path ---
+e.g. Z:\
+```
+The copy function will require also a target path to copy to.
 
