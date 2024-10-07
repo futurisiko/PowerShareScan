@@ -1,7 +1,7 @@
 # PowerShareScan
 
 Powershell Script/Tool to perform various scans to dump Security permission of FileServer and/or SVM.<br>
-***ATTENTION > Keep in mind that most of the permission analysis will consider just folders, not files.*** <br>
+***ATTENTION > Keep in mind that most of permission analysis will consider just folders, not files.*** <br>
 <br>
 
 ```
