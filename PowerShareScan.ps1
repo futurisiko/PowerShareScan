@@ -292,7 +292,7 @@ If ($choise -eq '5') {
 	$rootPath = $shareDump.P 
 	$shares = $shareDump.S
 	$DepthParam = SetDepth
-	Write-Host "`n---------------" -ForegroundColor green
+	Write-Host "`n---------------" -ForegroundColor greenZ
 	Write-Host "--- Started ---" -ForegroundColor green
 	Write-Host "---------------`n" -ForegroundColor green
 	$shares | ForEach-Object { $fullPath = $rootPath + $_ ; Get-ChildItem "$fullPath" @GetChildParam @DepthParam |
@@ -626,14 +626,20 @@ If ($choise -eq '14') {
 	$csvData = Import-Csv -Path $csvPath
 	# Main cycle
 	foreach ($row in $csvData) {
-		$relativePath = $row.FullPath -replace [regex]::Escape('\\'), '\'
+		$relativePathFirstClean = $row.FullPath -replace [regex]::Escape('\\'), '\'
+		$relativePath = $relativePathFirstClean -replace [regex]::Escape(':\'), '\'
 		### $relativePath = $row.FullPath -replace [regex]::Escape($sourceRoot), "" # Relative path if source path is to be removed
 		$destinationPath = Join-Path -Path $destinationRoot -ChildPath $relativePath # Destination path
 		$destinationDir = Split-Path -Path $destinationPath -Parent # Folder hierarchy creation
 		if (!(Test-Path -Path $destinationDir)) {
 			New-Item -ItemType Directory -Path $destinationDir | Out-Null
-			Write-Host "V" -NoNewLine -ForeGroundColor green 
-			Write-Host " - Successfully created $destinationDir"
+			if (!(Test-Path -Path $destinationDir)) { 
+				Write-Host "X" -NoNewLine -ForeGroundColor red 
+				Write-Host " - Failed created $destinationDir"
+			} else {
+				Write-Host "V" -NoNewLine -ForeGroundColor green 
+				Write-Host " - Successfully created $destinationDir"
+			}
 		}
 		Copy-Item -Path $row.FullPath -Destination $destinationPath # Copy target file
 		if (Test-Path -Path $destinationPath) { # Copy Verification
