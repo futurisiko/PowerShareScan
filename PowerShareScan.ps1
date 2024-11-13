@@ -96,6 +96,9 @@ Write-Host " is DISABLED in a TARGET share"
 Write-Host "14 - " -NoNewLine
 Write-Host "Copy Targeted File List" -NoNewLine -ForegroundColor cyan
 Write-Host " to the a new Location"
+Write-Host "15 - " -NoNewline
+Write-Host "Remove all explicit permissions" -NoNewLine -ForegroundColor cyan
+Write-Host " of a target user"
 # Choise loop
 do {
 	$choise = Read-Host -Prompt "`nSpecify function number"
@@ -659,6 +662,43 @@ If ($choise -eq '14') {
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }
+
+# 15 - Delete explicit permissions about target user/group
+If ($choise -eq '15') {
+	$shareDump = dumpAllShares
+	$rootPath = $shareDump.P 
+	Write-Host "`n--- Which share do you want to scan ? ---`n" -ForegroundColor green # Prompt for attribute to look for
+	$targetShare = Read-Host
+	$TargetUserName = SetTargetUser
+	Write-Host "`n--- Specify User Domain ---`n" -ForegroundColor green
+	$userDomain = Read-Host
+	$finalDomainUser = "$userDomain\$TargetUserName"
+	$DepthParam = SetDepth
+	Write-Host "`n--- Are you sure to delete permissions of $finalDomainUser ? ---" -ForegroundColor green
+	Write-Host "Click to start" -ForegroundColor yellow
+	$waitInput = Read-host
+	Write-Host "`n---------------" -ForegroundColor green
+	Write-Host "--- Started ---" -ForegroundColor green
+	Write-Host "---------------`n`n" -ForegroundColor green
+	$fullPath = $rootPath + $targetShare # Define the full path
+	Get-ChildItem "$fullPath" @GetChildParam @DepthParam | 
+	ForEach-Object { $TPath = $_ ;
+		$acl = Get-Acl -Path $TPath.FullName ;
+		$acl.Access | Where-Object {
+			$_.IdentityReference -eq $finalDomainUser	
+		} |
+		ForEach-Object {
+			$TFullPath = $TPath.FullName
+			Write-Host "VVV Removing permissions from VVV" -ForegroundColor green
+			Write-Host "$TFullPath"
+			$acl.RemoveAccessRule($_)
+			Set-Acl -Path $TPath.FullName -AclObject $acl ;
+		} ;
+	}
+	Write-Host "'n---------------------" -ForegroundColor green
+	Write-Host "--- Completed \m/ ---" -ForegroundColor green
+	Write-Host "---------------------`n" -ForegroundColor green
+}	
 	
 	
 
