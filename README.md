@@ -43,6 +43,7 @@ VMMMP   VMMMP  dMP dMP dMP dMP  By Futurisiko
 12 - Dump LastModifiedDate and Size of FILES from a TARGET SHARE into a CSV
 13 - Check where INHERITANCE is DISABLED in a TARGET share
 14 - Copy Targeted File List to the a new Location
+15 - Remove all explicit permissions of a target user
 
 Specify function number:
 ```
@@ -106,5 +107,11 @@ The copy function will require a csv file as input.<br><br>
 --- Destionation root path ---
 e.g. Z:\
 ```
-The copy function will require also a target path to copy to.
+The copy function will require also a target path to copy to.<br><br>
+```
+--- Target Username ---
+
+Specify the target username to look for
+```
+Finally the Remove all explicit permission ask also for a user/group name and delete recursevely all permissions related to it.
 
