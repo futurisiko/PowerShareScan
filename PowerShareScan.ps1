@@ -295,7 +295,7 @@ If ($choise -eq '5') {
 	$rootPath = $shareDump.P 
 	$shares = $shareDump.S
 	$DepthParam = SetDepth
-	Write-Host "`n---------------" -ForegroundColor greenZ
+	Write-Host "`n---------------" -ForegroundColor green
 	Write-Host "--- Started ---" -ForegroundColor green
 	Write-Host "---------------`n" -ForegroundColor green
 	$shares | ForEach-Object { $fullPath = $rootPath + $_ ; Get-ChildItem "$fullPath" @GetChildParam @DepthParam |
