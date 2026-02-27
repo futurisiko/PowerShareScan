@@ -5,6 +5,8 @@
 ### to performe various network
 ### shares scan.
 ###
+###	Version 2.0
+###
 ### By Nik aka Futurisiko
 ###############################
 
@@ -92,13 +94,19 @@ Write-Host "LastModifiedDate and Size" -NoNewLine -ForegroundColor cyan
 Write-Host " of FILES from a TARGET SHARE into a CSV"
 Write-Host "13 - Check where " -NoNewLine
 Write-Host "INHERITANCE" -NoNewLine -ForegroundColor cyan
-Write-Host " is DISABLED in a TARGET share"
+Write-Host " is DISABLED in a TARGET SHARE"
 Write-Host "14 - " -NoNewLine
 Write-Host "Copy Targeted File List" -NoNewLine -ForegroundColor cyan
 Write-Host " to the a new Location"
 Write-Host "15 - " -NoNewline
 Write-Host "Remove all explicit permissions" -NoNewLine -ForegroundColor cyan
 Write-Host " of a target user"
+Write-Host "16 - Find " -NoNewline
+Write-Host "TARGET USER" -NoNewLine -ForegroundColor cyan
+Write-Host " with a " -NoNewLine
+Write-Host "TARGET PERMISSION" -NoNewLine -ForegroundColor cyan
+Write-Host " in a TARGET SHARE"
+
 # Choise loop
 do {
 	$choise = Read-Host -Prompt "`nSpecify function number"
@@ -477,10 +485,10 @@ If ($choise -eq '10') {
 	Get-ChildItem "$fullPath" @GetChildParam @DepthParam | 
 	Where-Object { Get-Acl $_.FullName | 
 		Select-Object -ExpandProperty Access | 
-		Where-Object { $_.IdentityReference -match "$TargetUserName" } } | 
+		Where-Object { $_.IdentityReference -eq "$TargetUserName" } } | 
 	ForEach-Object { Write-Host $_.FullName -ForegroundColor green ; Get-Acl $_.FullName | 
 		Select-Object -ExpandProperty Access |  
-		Where-Object { $_.IdentityReference -match "$TargetUserName" } |
+		Where-Object { $_.IdentityReference -eq "$TargetUserName" } |
 		Select-Object FileSystemRights, IdentityReference }	| FL 2>$null
 	Write-Host "---------------------" -ForegroundColor green
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
@@ -699,7 +707,34 @@ If ($choise -eq '15') {
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }	
-	
+
+# 16 - Search TARGET USER with TARGET PERMISSION in a TARGET SHARE
+If ($choise -eq '16') {
+	$shareDump = dumpAllShares
+	$rootPath = $shareDump.P 
+	Write-Host "`n--- Which share do you want to scan ? ---`n" -ForegroundColor green # Prompt for attribute to look for
+	$targetShare = Read-Host
+	$TargetUserName = SetTargetUser
+	Write-Host "`n--- Which specific permission are you looking for ? ---" -ForegroundColor green 
+	Write-Host "e.g. Fullcontrol, Modify, Read, Execute..`n" -ForegroundColor yellow
+	$TargetPermission = Read-Host
+	$DepthParam = SetDepth
+	Write-Host "`n---------------" -ForegroundColor green
+	Write-Host "--- Started ---" -ForegroundColor green
+	Write-Host "---------------`n`n" -ForegroundColor green
+	$fullPath = $rootPath + $targetShare # Define the full path
+	Get-ChildItem "$fullPath" @GetChildParam @DepthParam | 
+	Where-Object { Get-Acl $_.FullName | 
+		Select-Object -ExpandProperty Access | 
+		Where-Object { $_.IdentityReference -match "$TargetUserName" -and $_.FileSystemRights -match "$TargetPermission" } } | 
+	ForEach-Object { Write-Host $_.FullName -ForegroundColor green ; Get-Acl $_.FullName | 
+		Select-Object -ExpandProperty Access |  
+		Where-Object { $_.IdentityReference -match "$TargetUserName" } |
+		Select-Object FileSystemRights, IdentityReference }	| FL 2>$null
+	Write-Host "---------------------" -ForegroundColor green
+	Write-Host "--- Completed \m/ ---" -ForegroundColor green
+	Write-Host "---------------------`n" -ForegroundColor green
+}	
 	
 
 ### Close task if opened ###
