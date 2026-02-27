@@ -44,6 +44,7 @@ VMMMP   VMMMP  dMP dMP dMP dMP  By Futurisiko
 13 - Check where INHERITANCE is DISABLED in a TARGET share
 14 - Copy Targeted File List to the a new Location
 15 - Remove all explicit permissions of a target user
+16 - Find TARGET USER with a TARGET PERMISSION in a TARGET SHARE
 
 Specify function number:
 ```
