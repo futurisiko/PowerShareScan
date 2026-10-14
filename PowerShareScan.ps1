@@ -9,9 +9,8 @@
 ###
 ### By Nik aka Futurisiko
 ###############################
-
-
-
+ 
+ 
 ### VARIABLES ####
 # Default Variable Setup
 $ErrorActionPreference = 'continue'
@@ -25,34 +24,30 @@ $GetChildParamFiles = @{
 	Recurse = $true
 }
 $TranscribeActive = 'no'
-
-
-
+ 
+ 
 ### BANNER ###
 Write-Host @"
-
-
+ 
+ 
     dMMMMb  .aMMMb  dMP dMP dMP dMMMMMP dMMMMb 
    dMP.dMP dMP dMP dMP dMP dMP dMP     dMP.dMP 
   dMMMMP  dMP dMP dMP dMP dMP dMMMP   dMMMMK  
- dMP     dMP.aMP dMP.dMP.dMP dMP     dMP AMF   
+dMP     dMP.aMP dMP.dMP.dMP dMP     dMP AMF   
 dMP      VMMMP   VMMMPVMMP  dMMMMMP dMP dMP    
-                                               
    .dMMMb  dMP dMP .aMMMb  dMMMMb  dMMMMMP     
   dMP  VP dMP dMP dMP dMP dMP.dMP dMP          
   VMMMb  dMMMMMP dMMMMMP dMMMMK  dMMMP         
 dP .dMP dMP dMP dMP dMP dMP AMF dMP            
 VMMMP  dMP dMP dMP dMP dMP dMP dMMMMMP         
-                                               
    .dMMMb  .aMMMb  .aMMMb  dMMMMb              
   dMP  VP dMP VMP dMP dMP dMP dMP              
   VMMMb  dMP     dMMMMMP dMP dMP               
 dP .dMP dMP.aMP dMP dMP dMP dMP                
 VMMMP   VMMMP  dMP dMP dMP dMP  By Futurisiko
 "@ -ForegroundColor magenta
-
-
-
+ 
+ 
 ### MENU ###
 # Text Menu
 Write-Host "`n`n--- MENU ---" -ForegroundColor green
@@ -106,7 +101,7 @@ Write-Host "TARGET USER" -NoNewLine -ForegroundColor cyan
 Write-Host " with a " -NoNewLine
 Write-Host "TARGET PERMISSION" -NoNewLine -ForegroundColor cyan
 Write-Host " in a TARGET SHARE"
-
+ 
 # Choise loop
 do {
 	$choise = Read-Host -Prompt "`nSpecify function number"
@@ -116,9 +111,8 @@ do {
 		Write-Host "Invalid input, please try again" -ForegroundColor yellow
 	}
 } while ($true)
-
-
-
+ 
+ 
 ### GENERAL FUNCTION & GLOBAL CHOISES ###
 # Suppress error choise
 Write-Host "`n--- Want to suppress errors? ---`n" -ForegroundColor green
@@ -126,7 +120,7 @@ $SuppressErrorChoise = Read-Host -Prompt "yes / no"
 If ($SuppressErrorChoise -eq 'yes') {
 	$ErrorActionPreference = 'silentlycontinue'
 }
-
+ 
 # Start Logging Function
 Write-Host "`n--- Output Logging ---`n" -ForegroundColor green
 Write-Host "Leave blank to not produce logs" -ForegroundColor yellow
@@ -137,7 +131,7 @@ if ($loggingOutputChoise -ne '') {
 	Start-Transcript -Path "$loggingOutputChoise" -Append
 	$TranscribeActive = 'yes'
 }
-
+ 
 # Function to dump FileServ/SVM SHARES
 function dumpAllShares {
 	Write-Host "`n--- Specify target SVM/SERVER ---" -ForegroundColor green
@@ -168,7 +162,7 @@ function dumpAllShares {
 		S = $shares
 	}
 }
-
+ 
 # Function to choise depth
 function SetDepth {
 	Write-Host "`n--- Scan Depth ---`n" -ForegroundColor green
@@ -184,7 +178,7 @@ function SetDepth {
 	}
 	return $DepthParam
 }
-
+ 
 # Function to choise target user
 function SetTargetUser {
 	$TargetUser = ""
@@ -198,9 +192,8 @@ function SetTargetUser {
 	}
 	return $TargetUser
 }
-
-
-
+ 
+ 
 ### OPERATIONS ###
 # 1 - EVERYONE Permission in ALL Shares function
 If ($choise -eq '1') {
@@ -214,16 +207,16 @@ If ($choise -eq '1') {
 	$shares | ForEach-Object { $fullPath = $rootPath + $_ ; Get-ChildItem "$fullPath" @GetChildParam @DepthParam | 
 		Where-Object { Get-Acl $_.FullName | 
 		Select-Object -ExpandProperty Access | 
-		Where-Object { $_.IdentityReference -match "Everyone" } } } | 
+		Where-Object { $_.IdentityReference -match "Everyone" -and $_.IsInherited -eq $false } } } | 
 	ForEach-Object { Write-Host $_.FullName -ForegroundColor green ; Get-Acl $_.FullName | 
 		Select-Object -ExpandProperty Access |  
-		Where-Object { $_.IdentityReference -match "Everyone" } |
+		Where-Object { $_.IdentityReference -match "Everyone" -and $_.IsInherited -eq $false } |
 		Select-Object FileSystemRights, IdentityReference }	| FL 2>$null
 	Write-Host "---------------------" -ForegroundColor green
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }
-
+ 
 # 2 - EVERYONE Permission in a TARGET share
 If ($choise -eq '2') {
 	$shareDump = dumpAllShares
@@ -238,16 +231,16 @@ If ($choise -eq '2') {
 	Get-ChildItem "$fullPath" @GetChildParam @DepthParam | 
 	Where-Object { Get-Acl $_.FullName | 
 		Select-Object -ExpandProperty Access | 
-		Where-Object { $_.IdentityReference -match 'Everyone' } } | 
+		Where-Object { $_.IdentityReference -match 'Everyone' -and $_.IsInherited -eq $false } } | 
 	ForEach-Object { Write-Host $_.FullName -ForegroundColor green ; Get-Acl $_.FullName | 
 		Select-Object -ExpandProperty Access |  
-		Where-Object { $_.IdentityReference -match 'Everyone' } |
+		Where-Object { $_.IdentityReference -match 'Everyone' -and $_.IsInherited -eq $false } |
 		Select-Object FileSystemRights, IdentityReference }	| FL 2>$null
 	Write-Host "---------------------" -ForegroundColor green
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }
-
+ 
 # 3 - GENERIC USER GROUPS Permission in ALL shares
 If ($choise -eq '3') {
 	$shareDump = dumpAllShares
@@ -260,16 +253,16 @@ If ($choise -eq '3') {
 	$shares | ForEach-Object { $fullPath = $rootPath + $_ ; Get-ChildItem "$fullPath" @GetChildParam @DepthParam | 
 		Where-Object { Get-Acl $_.FullName | 
 		Select-Object -ExpandProperty Access | 
-		Where-Object { $_.IdentityReference -match 'Users' } } } | 
+		Where-Object { $_.IdentityReference -match 'Users' -and $_.IsInherited -eq $false } } } | 
 	ForEach-Object { Write-Host $_.FullName -ForegroundColor green; Get-Acl $_.FullName | 
 		Select-Object -ExpandProperty Access | 
-		Where-Object { $_.IdentityReference -match 'Users' } | 
+		Where-Object { $_.IdentityReference -match 'Users' -and $_.IsInherited -eq $false } | 
 		Select-Object FileSystemRights, IdentityReference} | FL 2>$null
 	Write-Host "---------------------" -ForegroundColor green
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }
-
+ 
 # 4 - GENERIC USER GROUPS Permission in a TARGET share
 If ($choise -eq '4') {
 	$shareDump = dumpAllShares
@@ -284,16 +277,16 @@ If ($choise -eq '4') {
 	Get-ChildItem "$fullPath" @GetChildParam @DepthParam | 
 	Where-Object { Get-Acl $_.FullName | 
 		Select-Object -ExpandProperty Access | 
-		Where-Object { $_.IdentityReference -match 'Users' } } | 
+		Where-Object { $_.IdentityReference -match 'Users' -and $_.IsInherited -eq $false } } | 
 	ForEach-Object { Write-Host $_.FullName -ForegroundColor green ; Get-Acl $_.FullName | 
 		Select-Object -ExpandProperty Access |  
-		Where-Object { $_.IdentityReference -match 'Users' } |
+		Where-Object { $_.IdentityReference -match 'Users' -and $_.IsInherited -eq $false } |
 		Select-Object FileSystemRights, IdentityReference }	| FL 2>$null
 	Write-Host "---------------------" -ForegroundColor green
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }
-
+ 
 # 5 - DUMP ALL USERS/GROUPS present in ALL shares
 If ($choise -eq '5') {
 	If (Test-Path "temp_list") {
@@ -331,7 +324,7 @@ If ($choise -eq '5') {
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }
-
+ 
 # 6 - DUMP ALL USERS/GROUPS present in a TARGET share
 If ($choise -eq '6') {
 	If (Test-Path "temp_list") {
@@ -370,7 +363,7 @@ If ($choise -eq '6') {
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }
-
+ 
 # 7 - DUMP ALL PERMISSIONS assigned in ALL SHARES
 If ($choise -eq '7') {
 	If (Test-Path "temp_list") {
@@ -407,7 +400,7 @@ If ($choise -eq '7') {
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }
-
+ 
 # 8 - DUMP ALL PERMISSIONS assigned in a TARGET share
 If ($choise -eq '8') {
 	If (Test-Path "temp_list") {
@@ -445,7 +438,7 @@ If ($choise -eq '8') {
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }
-
+ 
 # 9 - Search TARGET USER Permissions in ALL SHARES
 If ($choise -eq '9') {
 	$shareDump = dumpAllShares
@@ -469,7 +462,7 @@ If ($choise -eq '9') {
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }
-
+ 
 # 10 - Search TARGET USER Permissions in a TARGET SHARE
 If ($choise -eq '10') {
 	$shareDump = dumpAllShares
@@ -485,16 +478,16 @@ If ($choise -eq '10') {
 	Get-ChildItem "$fullPath" @GetChildParam @DepthParam | 
 	Where-Object { Get-Acl $_.FullName | 
 		Select-Object -ExpandProperty Access | 
-		Where-Object { $_.IdentityReference -eq "$TargetUserName" } } | 
+		Where-Object { $_.IdentityReference -match "$TargetUserName" } } | 
 	ForEach-Object { Write-Host $_.FullName -ForegroundColor green ; Get-Acl $_.FullName | 
 		Select-Object -ExpandProperty Access |  
-		Where-Object { $_.IdentityReference -eq "$TargetUserName" } |
+		Where-Object { $_.IdentityReference -match "$TargetUserName" } |
 		Select-Object FileSystemRights, IdentityReference }	| FL 2>$null
 	Write-Host "---------------------" -ForegroundColor green
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }
-
+ 
 # 11 - Dump FILES LastModifiedDate and Size from ALL SHARES
 If ($choise -eq '11') {
 	$CSVFileName = ""
@@ -535,7 +528,7 @@ If ($choise -eq '11') {
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green	
 }
-
+ 
 # 12 - Dump FILES LastModifiedDate and Size from a TARGET SHARE
 If ($choise -eq '12') {
 	$CSVFileName = ""
@@ -576,7 +569,7 @@ If ($choise -eq '12') {
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green	
 }
-
+ 
 # 13 - Check where INHERITANCE is DISABLED in a TARGET share
 If ($choise -eq '13') {
 	$shareDump = dumpAllShares
@@ -590,7 +583,6 @@ If ($choise -eq '13') {
 	Write-Host "---------------`n" -ForegroundColor green
 	$fullPath = $rootPath + $targetShare # Define the full path
 	Get-ChildItem "$fullPath" @GetChildParam @DepthParam | 
-	
 	ForEach-Object { $folder = $_ ;
 		$acl = Get-Acl $folder.FullName ;
 		if ($acl.AreAccessRulesProtected) {
@@ -603,7 +595,7 @@ If ($choise -eq '13') {
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }
-
+ 
 # 14 - Copy Targeted Files to the new Path 
 If ($choise -eq '14') {
 	$csvFile = ""
@@ -670,7 +662,7 @@ If ($choise -eq '14') {
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }
-
+ 
 # 15 - Delete explicit permissions about target user/group
 If ($choise -eq '15') {
 	$shareDump = dumpAllShares
@@ -707,7 +699,7 @@ If ($choise -eq '15') {
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }	
-
+ 
 # 16 - Search TARGET USER with TARGET PERMISSION in a TARGET SHARE
 If ($choise -eq '16') {
 	$shareDump = dumpAllShares
@@ -735,13 +727,13 @@ If ($choise -eq '16') {
 	Write-Host "--- Completed \m/ ---" -ForegroundColor green
 	Write-Host "---------------------`n" -ForegroundColor green
 }	
-	
 
+ 
 ### Close task if opened ###
 # Stop Logging Function 
 if ($TranscribeActive -eq 'yes') {
 	Stop-Transcript | Out-Null
 	Write-Host "--- Logging Stopped ---`n" -ForegroundColor green
 }
-
+ 
 ### END ###
